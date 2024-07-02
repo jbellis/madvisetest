@@ -56,8 +56,13 @@ public class Main {
             long regionSize = Math.min(MAX_REGION_SIZE, fileSize - position);
             MappedByteBuffer fileMap = fileChannel.map(FileChannel.MapMode.READ_ONLY, position, regionSize);
 
+            // Debugging print statements to verify arguments
+            Pointer addr = Native.getDirectBufferPointer(fileMap);
+            System.out.println("Pointer address: " + addr);
+            System.out.println("Region size: " + regionSize);
+
             // Apply MADV_RANDOM to the memory-mapped region
-            int result = CLibrary.INSTANCE.madvise(Native.getDirectBufferPointer(fileMap), regionSize, 1 /* MADV_RANDOM */);
+            int result = CLibrary.INSTANCE.madvise(addr, regionSize, 1 /* MADV_RANDOM */);
             if (result != 0) {
                 int errno = Native.getLastError();
                 String errorMessage = Errno.INSTANCE.strerror(errno);
