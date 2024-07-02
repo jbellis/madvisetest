@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class Main {
 
-    private static final String FILENAME = "data/data/coherebench/embeddings_table-a5b9e560347b11efaf001bb676958899/cc-3ghc_1q72_2xo0g2nt06q1h93ee1-bti-SAI+ca+embeddings_table_embedding_idx+TermsData.db";
+    private static final String FILENAME = "/home/ubuntu/cassandra/data/data/coherebench/embeddings_table-a5b9e560347b11efaf001bb676958899/cc-3ghc_1q72_2xo0g2nt06q1h93ee1-bti-SAI+ca+embeddings_table_embedding_idx+TermsData.db";
     private static final int READ_SIZE = 10;
 
     private interface CLibrary extends com.sun.jna.Library {
