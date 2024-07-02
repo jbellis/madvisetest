@@ -17,17 +17,15 @@ public class Main {
 
     private static final String FILENAME = "/home/ubuntu/cassandra/data/data/coherebench/embeddings_table-a5b9e560347b11efaf001bb676958899/cc-3ghc_1q72_2xo0g2nt06q1h93ee1-bti-SAI+ca+embeddings_table_embedding_idx+TermsData.db";
     private static final int READ_SIZE = 10;
-    private static final long MAX_REGION_SIZE = 2L * 1024 * 1024 * 1024 - 4096; // aligned
+    private static final long MAX_REGION_SIZE = Integer.MAX_VALUE; // 2L * 1024 * 1024 * 1024 - 4096; // aligned
 
     private interface CLibrary extends com.sun.jna.Library {
-        int madvise(Pointer addr, long length, int advice);
+        int posix_madvise(Pointer addr, long length, int advice);
 
         CLibrary INSTANCE = Native.load("c", CLibrary.class);
     }
 
     private interface Errno extends com.sun.jna.Library {
-        int errno();
-
         String strerror(int errno);
 
         Errno INSTANCE = Native.load(Platform.C_LIBRARY_NAME, Errno.class);
@@ -62,7 +60,7 @@ public class Main {
             System.out.println("Region size: " + regionSize);
 
             // Apply MADV_RANDOM to the memory-mapped region
-            int result = CLibrary.INSTANCE.madvise(addr, regionSize, 1 /* MADV_RANDOM */);
+            int result = CLibrary.INSTANCE.posix_madvise(addr, regionSize, 1 /* MADV_RANDOM */);
             if (result != 0) {
                 int errno = Native.getLastError();
                 String errorMessage = Errno.INSTANCE.strerror(errno);
