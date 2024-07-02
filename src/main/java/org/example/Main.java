@@ -2,6 +2,7 @@ package org.example;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,14 @@ public class Main {
         int madvise(Pointer addr, long length, int advice);
 
         CLibrary INSTANCE = Native.load("c", CLibrary.class);
+    }
+
+    private interface Errno extends com.sun.jna.Library {
+        int errno();
+
+        String strerror(int errno);
+
+        Errno INSTANCE = Native.load(Platform.C_LIBRARY_NAME, Errno.class);
     }
 
     public static void main(String[] args) {
@@ -50,7 +59,9 @@ public class Main {
             // Apply MADV_RANDOM to the memory-mapped region
             int result = CLibrary.INSTANCE.madvise(Native.getDirectBufferPointer(fileMap), regionSize, 1 /* MADV_RANDOM */);
             if (result != 0) {
-                throw new IOException("Error applying MADV_RANDOM: " + result);
+                int errno = Native.getLastError();
+                String errorMessage = Errno.INSTANCE.strerror(errno);
+                throw new IOException("Error applying MADV_RANDOM: errno=" + errno + ", message=" + errorMessage);
             }
 
             regions.add(fileMap);
